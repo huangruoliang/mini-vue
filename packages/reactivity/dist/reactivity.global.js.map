@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/index.ts"],
+  "sourcesContent": ["import { isObject } from \"@vue/shared\";\n\n// isObject\nconsole.log(12312312)"],
+  "mappings": ";;AAGA,UAAQ,IAAI,QAAQ;",
+  "names": []
+}
