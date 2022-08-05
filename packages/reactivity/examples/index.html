@@ -1,20 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+
 <body>
+    <div id="app"></div>
     <script src="../dist//reactivity.global.js"></script>
     <script>
-        const {reactive} = VueReactivity
-        console.log(reactive)
-        const data = {a:1,b:2}
-        const proxy1 = reactive(data)
-        const proxy2 = reactive(proxy1)
+        const { reactive, effect } = VueReactivity
+        const data = reactive({ falg: true, a: 1, b: 2 })
+        // const proxy2 = reactive(proxy1)
+        effect(() => {
+            document.getElementById('app').innerHTML = data.falg ? "data.a=" + data.a : "data.b=" + data.b
+        })
+        setTimeout(() => {
+            data.a++
+            data.falg = false   
+        }, 3000)
+        // data.a
+        // data.a 
     </script>
-    
+
 </body>
+
 </html>
