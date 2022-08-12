@@ -16,12 +16,13 @@
         const data = reactive({ falg: true, a: 1, b: 2 })
         // const proxy2 = reactive(proxy1)
         effect(() => {
+            debugger
             document.getElementById('app').innerHTML = data.falg ? "data.a=" + data.a : "data.b=" + data.b
         })
         setTimeout(() => {
             data.a++
-            data.falg = false   
-        }, 3000)
+            data.falg = false
+        }, 1000)
         // data.a
         // data.a 
     </script>

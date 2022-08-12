@@ -13,9 +13,10 @@ export const mutableHandlers = {
     },
     set(target, key, value, receiver) {
         // target[key] = value
+        debugger
         let oldValue = target[key]
         let result = Reflect.set(target, key, value, receiver)
-        if (oldValue !== result) {
+        if (oldValue !== value) {
             trigger(target, 'set', key, value, oldValue)
         }
         return result

@@ -4,7 +4,6 @@ function clearnupEffect(effect) {
     const { deps } = effect
     // deeps = []
     for (let i = 0; i < deps.length; i++) {
-        debugger
         deps[i].delete(effect)
     }
     deps.length = 0
@@ -28,12 +27,21 @@ class ReactiveEffect {
             this.parent = null
         }
     }
+    stop() {
+        this.active = false
+        clearnupEffect(this)
+    }
 }
 
 export function effect(fn) {
     const _effect = new ReactiveEffect(fn)
 
     _effect.run()
+
+    const runner = _effect.run.bind(_effect)
+    runner.effect = _effect
+
+    return runner
 }
 
 const targetMap = new WeakMap()
@@ -63,11 +71,14 @@ export function track(target, type, key) {
 export function trigger(target, type, key, newValue, oldValue) {
     const depsMap = targetMap.get(target)
     if (!depsMap) return
-    const effects = depsMap.get(key)
+    let effects = depsMap.get(key)
+    if (effects) {
+        effects = [...effects]
+        effects?.forEach(effect => {
+            if (activeEffect !== effect) {
+                effect.run()
+            }
+        });
+    }
 
-    effects?.forEach(effect => {
-        if (activeEffect !== effect) {
-            effect.run()
-        }
-    });
 }

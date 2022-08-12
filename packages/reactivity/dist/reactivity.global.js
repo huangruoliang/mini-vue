@@ -34,7 +34,6 @@ var VueReactivity = (() => {
   function clearnupEffect(effect2) {
     const { deps } = effect2;
     for (let i = 0; i < deps.length; i++) {
-      debugger;
       deps[i].delete(effect2);
     }
     deps.length = 0;
@@ -60,10 +59,17 @@ var VueReactivity = (() => {
         this.parent = null;
       }
     }
+    stop() {
+      this.active = false;
+      clearnupEffect(this);
+    }
   };
   function effect(fn) {
     const _effect = new ReactiveEffect(fn);
     _effect.run();
+    const runner = _effect.run.bind(_effect);
+    runner.effect = _effect;
+    return runner;
   }
   var targetMap = /* @__PURE__ */ new WeakMap();
   function track(target, type, key) {
@@ -87,12 +93,15 @@ var VueReactivity = (() => {
     const depsMap = targetMap.get(target);
     if (!depsMap)
       return;
-    const effects = depsMap.get(key);
-    effects == null ? void 0 : effects.forEach((effect2) => {
-      if (activeEffect !== effect2) {
-        effect2.run();
-      }
-    });
+    let effects = depsMap.get(key);
+    if (effects) {
+      effects = [...effects];
+      effects == null ? void 0 : effects.forEach((effect2) => {
+        if (activeEffect !== effect2) {
+          effect2.run();
+        }
+      });
+    }
   }
 
   // packages/reactivity/src/baseHandler.ts
@@ -105,9 +114,10 @@ var VueReactivity = (() => {
       return Reflect.get(target, key, receiver);
     },
     set(target, key, value, receiver) {
+      debugger;
       let oldValue = target[key];
       let result = Reflect.set(target, key, value, receiver);
-      if (oldValue !== result) {
+      if (oldValue !== value) {
         trigger(target, "set", key, value, oldValue);
       }
       return result;
