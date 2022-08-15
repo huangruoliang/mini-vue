@@ -9,11 +9,11 @@ function clearnupEffect(effect) {
     deps.length = 0
 
 }
-class ReactiveEffect {
+export class ReactiveEffect {
     active = true
     parent = null
     deps = [] //effect依赖的属性所拥有的effect
-    constructor(public fn) { }
+    constructor(public fn,public scheduler) { }
     run() {
         if (!this.active) { return this.fn() }
 
@@ -33,8 +33,8 @@ class ReactiveEffect {
     }
 }
 
-export function effect(fn) {
-    const _effect = new ReactiveEffect(fn)
+export function effect(fn, options: any = {}) {
+    const _effect = new ReactiveEffect(fn, options.schedulers)
 
     _effect.run()
 
@@ -76,7 +76,12 @@ export function trigger(target, type, key, newValue, oldValue) {
         effects = [...effects]
         effects?.forEach(effect => {
             if (activeEffect !== effect) {
-                effect.run()
+                // effect.run()
+                if(effect.scheduler) {
+                    effect.scheduler()
+                }else {
+                    effect.run()
+                }
             }
         });
     }
